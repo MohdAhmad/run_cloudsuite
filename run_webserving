@@ -16,4 +16,4 @@ docker run -d -t --net=my_net --privileged=true --name=faban_client cloudsuite/w
 sleep 10 
 
 exec $(pwd)/run.sh &
-sleep 240 
+sleep 190 

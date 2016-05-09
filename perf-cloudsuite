@@ -14,69 +14,71 @@ perf_command="perf stat -D $skip_time -I $sampling_time -e $events -x , -o"
 spec_command="runspec -a onlyrun -c huzi.cfg --noreportable --size=ref --tune=base --iterations=1"
 
 ##data-analytics benchmark
-#./run_dataanalytics
-#$perf_command $results/dataanalytics-cloudsuite.csv -p $(ps axj | grep spark-1.5.1 | awk '$10!="grep" {print $2}') &
-#sleep $running_time
-#kill -TERM -`ps -e | grep perf | awk '{print $1}'`
-#./docker_cleanup
+./run_dataanalytics
+$perf_command $results/dataanalytics-cloudsuite.csv -p $(ps axj | grep spark-1.5.1 | awk '$10!="grep" {print $2}') &
+sleep $running_time
+kill -TERM -`ps -e | grep perf | awk '{print $1}'`
+./docker_cleanup
 
 ##data-caching benchmark
-#./run_datacaching 
-#SERVER_PID=$(ps axj | grep memcache | awk '$10=="memcached" {print $2}')
-#CLIENT_PID=$(ps axj | grep loader | awk '$10=="./loader" {print $2}')
-#echo "SERVER_PID:" $SERVER_PID
-#echo "CLIENT_PID:" $CLIENT_PID
-#$perf_command $results/datacaching-cloudsuite.csv -p $SERVER_PID,$CLIENT_PID &
-#sleep $running_time
-#kill -TERM -`ps -e | grep perf | awk '{print $1}'`
-#./docker_cleanup
+./run_datacaching 
+SERVER_PID=$(ps axj | grep memcache | awk '$10=="memcached" {print $2}')
+CLIENT_PID=$(ps axj | grep loader | awk '$10=="./loader" {print $2}')
+echo "SERVER_PID:" $SERVER_PID
+echo "CLIENT_PID:" $CLIENT_PID
+$perf_command $results/datacaching-cloudsuite.csv -p $SERVER_PID,$CLIENT_PID &
+sleep $running_time
+kill -TERM -`ps -e | grep perf | awk '{print $1}'`
+./docker_cleanup
 
 ##webserver application 
-#./run_webserving
-#SERVER_PIDS=""
-#PIDS=$(ps axj | grep "nginx: worker" | awk '$10!="grep" {print $2}')
-# 
-#for pid in $PIDS; do
-#	SERVER_PIDS+=$pid","
-#done
-#echo "SERVER_PIDS:" $SERVER_PIDS
-#
-#PHP_PIDS=""
-#PIDS=$(ps axj | grep "php-fpm: pool" | awk '$10!="grep" {print $2}')
-#
-#for pid in $PIDS; do
-#	PHP_PIDS+=$pid","
-#done
-#echo "PHP_PIDS:" $PHP_PIDS
-# 
-#MEMCACHED_PID=$(ps axj | grep "memcached" | awk '{if ($10=="memcached") print $2}')
-#echo "MEMCACHED_PID:" $MEMCACHED_PID
-# 
-# 
-#MYSQL_PID=$(ps axj | grep "mysql" | awk '{if ($10!="grep") print $2}')
-#echo "MYSQL_PID:" $MYSQL_PID
-# 
-#CLIENT_PIDS=$(ps axj | grep DisableExplicitGC | awk '$10!="grep" {print $2}')
-#CLIENT_PIDS+=","$(ps axj | grep Xms64m | awk '$10!="grep" {print $2}')
-#echo "CLIENT_PIDS:" $CLIENT_PIDS
-# 
-#ALL_PIDS=$SERVER_PIDS$PHP_PIDS$MEMCACHED_PID","$MYSQL_PID","$CLIENT_PIDS
-#echo "ALL_PIDS:" $ALL_PIDS
-# 
-#$perf_command $results/webserving-cloudsuite.csv -p $ALL_PIDS &
-#sleep $running_time
-#kill -TERM -`ps -e | grep perf | awk '{print $1}'`
-#./docker_cleanup
+./run_webserving
+SERVER_PIDS=""
+PIDS=$(ps axj | grep "nginx: worker" | awk '$10!="grep" {print $2}')
+ 
+for pid in $PIDS; do
+	SERVER_PIDS+=$pid","
+done
+echo "SERVER_PIDS:" $SERVER_PIDS
+
+PHP_PIDS=""
+PIDS=$(ps axj | grep "php-fpm: pool" | awk '$10!="grep" {print $2}')
+
+for pid in $PIDS; do
+	PHP_PIDS+=$pid","
+done
+echo "PHP_PIDS:" $PHP_PIDS
+ 
+MEMCACHED_PID=$(ps axj | grep "memcached" | awk '{if ($10=="memcached") print $2}')
+echo "MEMCACHED_PID:" $MEMCACHED_PID
+ 
+ 
+MYSQL_PID=$(ps axj | grep "mysql" | awk '{if ($10!="grep") print $2}')
+echo "MYSQL_PID:" $MYSQL_PID
+ 
+CLIENT_PIDS=$(ps axj | grep DisableExplicitGC | awk '$10!="grep" {print $2}')
+CLIENT_PIDS+=","$(ps axj | grep Xms64m | awk '$10!="grep" {print $2}')
+echo "CLIENT_PIDS:" $CLIENT_PIDS
+ 
+ALL_PIDS=$SERVER_PIDS$PHP_PIDS$MEMCACHED_PID","$MYSQL_PID","$CLIENT_PIDS
+echo "ALL_PIDS:" $ALL_PIDS
+ 
+$perf_command $results/webserving-cloudsuite.csv -p $ALL_PIDS &
+sleep $running_time
+kill -TERM -`ps -e | grep perf | awk '{print $1}'`
+./docker_cleanup
 
 ##Data serving -- setup takes around 5mins
 ./setup_dataserving
 ./run_dataserving
 MONGO_PID=$(ps axj | grep mongod | awk '$10=="./bin/mongod" {print $2}')
 YCSB_PID=$(ps axj | grep ycsb | awk '$10=="java" {print $2}')
+echo "MONGO_PID:" $MONGO_PID
+echo "YCSB_PID:" $YCSB_PID
 $perf_command $results/dataserving-cloudsuite.csv -p $MONGO_PID,$YCSB_PID &
 sleep $running_time
 kill -TERM -`ps -e | grep perf | awk '{print $1}'`
-
+./docker_cleanup
 
 # All of these currencies use the same cpuminer
 #cd /home/ahmad/cpuminer-multi-windows
