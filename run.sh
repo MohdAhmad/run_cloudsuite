@@ -10,4 +10,3 @@ docker exec faban_client sh -c "sed -i 's/<port.*/<port>8080<\\/port>/' /web20_b
 docker exec faban_client sh -c "sed -i 's/<outputDir.*/<outputDir>\/faban\/output<\\/outputDir>/' /web20_benchmark/deploy/run.xml"
 docker exec faban_client sh -c "cd /web20_benchmark && ant run"
 docker exec faban_client sh -c "cat /faban/output/*/summary.xml" > summary.xml
-
