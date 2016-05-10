@@ -1,19 +1,19 @@
 #!/bin/bash
 
-#creates mongodb dataset of ~10GB
+#creates mongodb dataset of ~20GB
 
 docker pull mohdahmad/mongodb-test:0.2
 
 docker run --name mongodb-bench -d -t mohdahmad/mongodb-test:0.2 
-echo "Launched container"
+echo "launched container"
 
 docker exec -t -d mongodb-bench bash -c "cd /home/mongodb-linux-x86_64-3.2.6 ; ./bin/mongod --dbpath /tmp/mongodb"
-echo "Launched MongoDb"
+echo "launched MongoDb"
 
 sleep 5
 
-docker exec -t mongodb-bench bash -c "cd /usr/local/ycsb-0.5.0 ; ./bin/ycsb load mongodb-async -s -P workloads/workloadb > outputLoad1.txt -p recordcount=833333 -p mongodb.upsert=true" 
-echo "Loaded data"
+docker exec -t mongodb-bench bash -c "cd /usr/local/ycsb-0.5.0 ; ./bin/ycsb load mongodb-async -s -P workloads/workloadb > outputLoad1.txt -p recordcount=2000000 -p mongodb.upsert=true" 
+echo "loaded data"
 sleep 3
 
 #scalegrid.io/blog/how-to-benchmark-mongodb-with-ycsb/

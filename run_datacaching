@@ -4,9 +4,6 @@
 
 docker network create caching_network
 
-docker pull cloudsuite/data-caching:server
-docker pull mohdahmad/data-caching:client
-
 docker run --name dc-server --net caching_network -d cloudsuite/data-caching:server -t 4 -m 4096 -n 550
 
 docker run -t -d --name dc-client --net caching_network mohdahmad/data-caching:client bash

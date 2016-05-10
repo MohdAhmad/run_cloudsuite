@@ -1,5 +1,12 @@
 #!/bin/bash
 
-#4 million operations from the read-heavy ycsb workload (95% reads)
-docker exec -dt mongodb-bench bash -c "cd /usr/local/ycsb-0.5.0 ; ./bin/ycsb run mongodb-async -s -P workloads/workloadb > outputRun.txt -p operationcount=4000000; cat outputRun.txt"
+docker run --name mongodb-bench -d -t mohdahmad/mongodb-test:0.4
+echo "launched container..."
+
+docker exec -t -d mongodb-bench bash -c "cd /home/mongodb-linux-x86_64-3.2.6 ; ./bin/mongod --dbpath /tmp/mongodb"
+echo "launched mongoDb..."
+sleep 30
+
+#4 million operations, 50% read, 50% write  
+docker exec -d mongodb-bench bash -c "cd /usr/local/ycsb-0.5.0 ; ./bin/ycsb run mongodb-async -s -P workloads/workloada > outputRun.txt -p operationcount=4000000; cat outputRun.txt" &
 sleep 15

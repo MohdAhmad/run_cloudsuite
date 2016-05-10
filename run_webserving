@@ -1,10 +1,6 @@
 #!/bin/bash
 
 docker network create my_net
-docker pull cloudsuite/web-serving:web_server
-docker pull cloudsuite/web-serving:db_server
-docker pull cloudsuite/web-serving:memcached_server
-docker pull cloudsuite/web-serving:faban_client
 
 docker run -d -t --net=my_net --privileged=true --name=web_server cloudsuite/web-serving:web_server /etc/bootstrap.sh
 sleep 2
@@ -16,4 +12,4 @@ docker run -d -t --net=my_net --privileged=true --name=faban_client cloudsuite/w
 sleep 10 
 
 exec $(pwd)/run.sh &
-sleep 190 
+sleep 240 

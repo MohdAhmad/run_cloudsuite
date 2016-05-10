@@ -1,0 +1,20 @@
+#!/bin/bash
+
+##data-analytics
+docker pull cloudsuite/in-memory-analytics
+docker pull cloudsuite/movielens-dataset
+
+
+##data-caching
+docker pull cloudsuite/data-caching:server
+docker pull mohdahmad/data-caching:client
+
+
+##web-serving
+docker pull cloudsuite/web-serving:web_server
+docker pull cloudsuite/web-serving:db_server
+docker pull cloudsuite/web-serving:memcached_server
+docker pull cloudsuite/web-serving:faban_client
+
+##data-serving
+docker pull mohdahmad/mongodb-test:0.4
