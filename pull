@@ -17,4 +17,5 @@ docker pull cloudsuite/web-serving:memcached_server
 docker pull cloudsuite/web-serving:faban_client
 
 ##data-serving
-docker pull mohdahmad/mongodb-test:0.4
+docker pull mohdahmad/data-serving:client
+docker pull cloudsuite/data-serving:server

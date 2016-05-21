@@ -1,6 +1,14 @@
 #!/bin/bash
 
 docker create --name data cloudsuite/movielens-dataset
-docker run -d --volumes-from data cloudsuite/in-memory-analytics  /data/ml-latest /data/myratings.csv --driver-memory 4g --executor-memory 4g
-
-sleep 10
+if [ $1 == "background" ]; then #run with -d
+        while true; do
+                id=$(docker run -d --cpuset-cpus="8" --volumes-from data cloudsuite/in-memory-analytics  /data/ml-latest-small /data/myratings.csv --driver-memory 4g --executor-memory 4g)
+                docker wait $id
+        done
+else 
+        for d in `seq 5`; do
+                docker run --cpuset-cpus="8" --volumes-from data cloudsuite/in-memory-analytics  /data/ml-latest-small /data/myratings.csv --driver-memory 4g --executor-memory 4g >> $1 
+                echo -----------------------------------------------------------------------
+        done
+fi

@@ -2,14 +2,17 @@
 
 docker network create my_net
 
-docker run -d -t --net=my_net --privileged=true --name=web_server cloudsuite/web-serving:web_server /etc/bootstrap.sh
+docker run -d -t --cpuset-cpus="8" --net=my_net --privileged=true --name=web_server cloudsuite/web-serving:web_server /etc/bootstrap.sh
 sleep 2
-docker run -d -t --net=my_net --privileged=true --name=mysql_server cloudsuite/web-serving:db_server
+docker run -d -t --cpuset-cpus="4-7" --net=my_net --privileged=true --name=mysql_server cloudsuite/web-serving:db_server
 sleep 2
-docker run -d -t --net=my_net --privileged=true --name=memcache_server cloudsuite/web-serving:memcached_server
+docker run -d -t  --cpuset-cpus="4-7" --net=my_net --privileged=true --name=memcache_server cloudsuite/web-serving:memcached_server
 sleep 2
-docker run -d -t --net=my_net --privileged=true --name=faban_client cloudsuite/web-serving:faban_client /etc/bootstrap.sh -bash
+docker run -d -t --cpuset-cpus="4-7" --net=my_net --privileged=true --name=faban_client cloudsuite/web-serving:faban_client /etc/bootstrap.sh -bash
 sleep 10 
 
-exec $(pwd)/run.sh &
-sleep 240 
+if [ $1 == "background" ]; then #run_background which has longer steady state time
+        exec $(pwd)/run_background.sh &
+else 
+        exec $(pwd)/run.sh $1
+fi

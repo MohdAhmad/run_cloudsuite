@@ -1,0 +1,7 @@
+#!/bin/bash
+
+if [ $1 == 'background' ]; then 
+        docker run -d --cpuset-cpus="8" partialcompilation_spec bash -c  ". ./shrc; runspec --config=testing-amd64-gcc43.cfg --noreportable --tune=base --size=ref -v 10 --iterations=100 445.gobmk"
+else 
+        docker run --cpuset-cpus="8" partialcompilation_spec bash -c  ". ./shrc; runspec --config=testing-amd64-gcc43.cfg --noreportable --tune=base --size=ref -v 10 --iterations=5 445.gobmk" > $1
+fi
