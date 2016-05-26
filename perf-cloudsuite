@@ -78,137 +78,138 @@ echo "YCSB_PID:" $YCSB_PID
 $perf_command $results/dataserving-cloudsuite.csv -p $MONGO_PID,$YCSB_PID &
 sleep $running_time
 kill -TERM -`ps -e | grep perf | awk '{print $1}'`
-./docker_cleanup
-# All of these currencies use the same cpuminer
-#cd /home/ahmad/cpuminer-multi-windows
-#
-## Litecoin (Scrypt)
-#$perf_command $results/scrypt_perf_cpu.csv -- ./cpuminer -a scrypt -o stratum+tcp://us.litecoinpool.org:3333 -u rashidtahir.worker1 -p rashid &
-#sleep $running_time
-#pkill cpuminer
-#
-## Bytecoin (CryptoNight)
-#$perf_command $results/byte_perf_cpu.csv -- ./cpuminer -a cryptonight -o stratum+tcp://bcn.pool.minergate.com:45550 -u rashid.tahir.khan@gmail.com -p rashiduiuc &
-#sleep $running_time
-#pkill cpuminer
-#
-## Dash (X11)
-## Old server doesn't work. stratum+tcp://dash.suprnova.cc:9995
-#$perf_command $results/dash_perf_cpu.csv -- ./cpuminer -a x11 -o stratum+tcp://dark80.suprnova.cc:443 -u rashidtahir.worker1 -p rashid &
-#sleep $running_time
-#pkill cpuminer
-#
-## Quarkcoin (9 rounds of 6 different hashing algorithms)
-#$perf_command $results/quark_perf_cpu.csv -- ./cpuminer -a quark -o stratum+tcp://qrk.suprnova.cc:6666 -u rashidtahir.worker1 -p rashid &
-#sleep $running_time
-#pkill cpuminer
-#
-## Vertcoin (Lyra2RE)
-## Old server doesn't work. stratum+tcp://pool.verters.com:4444
-#$perf_command $results/vert_perf_cpu.csv -- ./cpuminer -a lyra2rev2 -o stratum+tcp://vtc.alwayshashing.com:9171 -u rashidtahir.worker1 -p rashid &
-#sleep $running_time
-#pkill cpuminer
-#
-#echo "LIKE A MINERS"
-#
-## SPEC
-## Note: SPEC runs until the specified benchmark finishes execution (there is no
-## flag to tell it to terminate early) and there is no way to stop it except by
-## doing Ctrl+C while profiling with perf.  Therefore, we must do "Ctrl+C" in
-## this script as follows:
-## 1) Launch SPEC in background using "&".
-## 2) Sleep for desired amount of time (e.g. 50 seconds).
-## 3) Kill *SPEC* (*not* perf) using kill.
-## 4) Barty. Hard. While drinking Bebsi.
-#cd /home/ahmad/spec2006
-#. ./shrc
-#
-## INT
-## perl
-#$perf_command $results/perl_perf.csv -- $spec_command perlbench &
-#sleep $running_time
-#kill -TERM -`ps -e | grep runspec | awk '{print $1}'`
-#
-## bzip2
-#$perf_command $results/bzip2_perf.csv -- $spec_command bzip2 &
-#sleep $running_time
-#kill -TERM -`ps -e | grep runspec | awk '{print $1}'`
-#
-## gcc
-#$perf_command $results/gcc_perf.csv -- $spec_command gcc &
-#sleep $running_time
-#kill -TERM -`ps -e | grep runspec | awk '{print $1}'`
-#
-## mcf
-#$perf_command $results/mcf_perf.csv -- $spec_command mcf &
-#sleep $running_time
-#kill -TERM -`ps -e | grep runspec | awk '{print $1}'`
-#
-## gobmk
-#$perf_command $results/gobmk_perf.csv -- $spec_command gobmk &
-#sleep $running_time
-#kill -TERM -`ps -e | grep runspec | awk '{print $1}'`
-#
-## hmmer
-#$perf_command $results/hmmer_perf.csv -- $spec_command hmmer &
-#sleep $running_time
-#kill -TERM -`ps -e | grep runspec | awk '{print $1}'`
-#
-## sjeng
-#$perf_command $results/sjeng_perf.csv -- $spec_command sjeng &
-#sleep $running_time
-#kill -TERM -`ps -e | grep runspec | awk '{print $1}'`
-#
-## libquantum
-#$perf_command $results/libquantum_perf.csv -- $spec_command libquantum &
-#sleep $running_time
-#kill -TERM -`ps -e | grep runspec | awk '{print $1}'`
-#
-## h264ref
-#$perf_command $results/h264ref_perf.csv -- $spec_command h264ref &
-#sleep $running_time
-#kill -TERM -`ps -e | grep runspec | awk '{print $1}'`
-#
-## astar
-#$perf_command $results/astar_perf.csv -- $spec_command astar &
-#sleep $running_time
-#kill -TERM -`ps -e | grep runspec | awk '{print $1}'`
-#
-## xalancbmk
-#$perf_command $results/xalancbmk_perf.csv -- $spec_command xalancbmk &
-#sleep $running_time
-#kill -TERM -`ps -e | grep runspec | awk '{print $1}'`
-#
-## FP
-## milc
-#$perf_command $results/milc_perf.csv -- $spec_command milc &
-#sleep $running_time
-#kill -TERM -`ps -e | grep runspec | awk '{print $1}'`
-#
-## namd
-#$perf_command $results/namd_perf.csv -- $spec_command namd &
-#sleep $running_time
-#kill -TERM -`ps -e | grep runspec | awk '{print $1}'`
-#
-## soplex
-#$perf_command $results/soplex_perf.csv -- $spec_command soplex &
-#sleep $running_time
-#kill -TERM -`ps -e | grep runspec | awk '{print $1}'`
-#
-## povray
-#$perf_command $results/povray_perf.csv -- $spec_command povray &
-#sleep $running_time
-#kill -TERM -`ps -e | grep runspec | awk '{print $1}'`
-#
-## lbm
-#$perf_command $results/lbm_perf.csv -- $spec_command lbm &
-#sleep $running_time
-#kill -TERM -`ps -e | grep runspec | awk '{print $1}'`
-#
-## sphinx3
-#$perf_command $results/sphinx3_perf.csv -- $spec_command sphinx3 &
-#sleep $running_time
-#kill -TERM -`ps -e | grep runspec | awk '{print $1}'`
-#
-#echo "LIKE A SPEC"
-#
+/docker_cleanup
+
+#All of these currencies use the same cpuminer
+cd /home/ahmad/cpuminer-multi-windows
+
+# Litecoin (Scrypt)
+$perf_command $results/scrypt_perf_cpu.csv -- ./cpuminer -a scrypt -o stratum+tcp://us.litecoinpool.org:3333 -u rashidtahir.worker1 -p rashid &
+sleep $running_time
+pkill cpuminer
+
+# Bytecoin (CryptoNight)
+$perf_command $results/byte_perf_cpu.csv -- ./cpuminer -a cryptonight -o stratum+tcp://bcn.pool.minergate.com:45550 -u rashid.tahir.khan@gmail.com -p rashiduiuc &
+sleep $running_time
+pkill cpuminer
+
+# Dash (X11)
+# Old server doesn't work. stratum+tcp://dash.suprnova.cc:9995
+$perf_command $results/dash_perf_cpu.csv -- ./cpuminer -a x11 -o stratum+tcp://dark80.suprnova.cc:443 -u rashidtahir.worker1 -p rashid &
+sleep $running_time
+pkill cpuminer
+
+# Quarkcoin (9 rounds of 6 different hashing algorithms)
+$perf_command $results/quark_perf_cpu.csv -- ./cpuminer -a quark -o stratum+tcp://qrk.suprnova.cc:6666 -u rashidtahir.worker1 -p rashid &
+sleep $running_time
+pkill cpuminer
+
+# Vertcoin (Lyra2RE)
+# Old server doesn't work. stratum+tcp://pool.verters.com:4444
+$perf_command $results/vert_perf_cpu.csv -- ./cpuminer -a lyra2rev2 -o stratum+tcp://vtc.alwayshashing.com:9171 -u rashidtahir.worker1 -p rashid &
+sleep $running_time
+pkill cpuminer
+
+echo "LIKE A MINERS"
+
+# SPEC
+# Note: SPEC runs until the specified benchmark finishes execution (there is no
+# flag to tell it to terminate early) and there is no way to stop it except by
+# doing Ctrl+C while profiling with perf.  Therefore, we must do "Ctrl+C" in
+# this script as follows:
+# 1) Launch SPEC in background using "&".
+# 2) Sleep for desired amount of time (e.g. 50 seconds).
+# 3) Kill *SPEC* (*not* perf) using kill.
+# 4) Barty. Hard. While drinking Bebsi.
+cd /home/ahmad/spec2006
+. ./shrc
+
+# INT
+# perl
+$perf_command $results/perl_perf.csv -- $spec_command perlbench &
+sleep $running_time
+kill -TERM -`ps -e | grep runspec | awk '{print $1}'`
+
+# bzip2
+$perf_command $results/bzip2_perf.csv -- $spec_command bzip2 &
+sleep $running_time
+kill -TERM -`ps -e | grep runspec | awk '{print $1}'`
+
+# gcc
+$perf_command $results/gcc_perf.csv -- $spec_command gcc &
+sleep $running_time
+kill -TERM -`ps -e | grep runspec | awk '{print $1}'`
+
+# mcf
+$perf_command $results/mcf_perf.csv -- $spec_command mcf &
+sleep $running_time
+kill -TERM -`ps -e | grep runspec | awk '{print $1}'`
+
+# gobmk
+$perf_command $results/gobmk_perf.csv -- $spec_command gobmk &
+sleep $running_time
+kill -TERM -`ps -e | grep runspec | awk '{print $1}'`
+
+# hmmer
+$perf_command $results/hmmer_perf.csv -- $spec_command hmmer &
+sleep $running_time
+kill -TERM -`ps -e | grep runspec | awk '{print $1}'`
+
+# sjeng
+$perf_command $results/sjeng_perf.csv -- $spec_command sjeng &
+sleep $running_time
+kill -TERM -`ps -e | grep runspec | awk '{print $1}'`
+
+# libquantum
+$perf_command $results/libquantum_perf.csv -- $spec_command libquantum &
+sleep $running_time
+kill -TERM -`ps -e | grep runspec | awk '{print $1}'`
+
+# h264ref
+$perf_command $results/h264ref_perf.csv -- $spec_command h264ref &
+sleep $running_time
+kill -TERM -`ps -e | grep runspec | awk '{print $1}'`
+
+# astar
+$perf_command $results/astar_perf.csv -- $spec_command astar &
+sleep $running_time
+kill -TERM -`ps -e | grep runspec | awk '{print $1}'`
+
+# xalancbmk
+$perf_command $results/xalancbmk_perf.csv -- $spec_command xalancbmk &
+sleep $running_time
+kill -TERM -`ps -e | grep runspec | awk '{print $1}'`
+
+# FP
+# milc
+$perf_command $results/milc_perf.csv -- $spec_command milc &
+sleep $running_time
+kill -TERM -`ps -e | grep runspec | awk '{print $1}'`
+
+# namd
+$perf_command $results/namd_perf.csv -- $spec_command namd &
+sleep $running_time
+kill -TERM -`ps -e | grep runspec | awk '{print $1}'`
+
+# soplex
+$perf_command $results/soplex_perf.csv -- $spec_command soplex &
+sleep $running_time
+kill -TERM -`ps -e | grep runspec | awk '{print $1}'`
+
+# povray
+$perf_command $results/povray_perf.csv -- $spec_command povray &
+sleep $running_time
+kill -TERM -`ps -e | grep runspec | awk '{print $1}'`
+
+# lbm
+$perf_command $results/lbm_perf.csv -- $spec_command lbm &
+sleep $running_time
+kill -TERM -`ps -e | grep runspec | awk '{print $1}'`
+
+# sphinx3
+$perf_command $results/sphinx3_perf.csv -- $spec_command sphinx3 &
+sleep $running_time
+kill -TERM -`ps -e | grep runspec | awk '{print $1}'`
+
+echo "LIKE A SPEC"
+

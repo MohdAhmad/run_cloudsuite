@@ -1,7 +1,9 @@
 #!/bin/bash
 
-#kill all data analytic containers
-docker kill $(sudo docker ps -a -q)
+#kill all containers apart from the weave containers
+docker kill $(docker ps | awk '!/weave/ {print $1}' | tail -n+2)
 
-#rm all data analytic containers
-docker rm -f $(sudo docker ps -a -q)
+
+#rm all containers apart from the weave containers
+docker rm -f $(docker ps -a | awk '!/weave/ {print $1}' | tail -n+2)
+
