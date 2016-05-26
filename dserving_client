@@ -1,16 +1,18 @@
 #!/bin/bash
 
-docker run --cpuset-cpus="8" --name mongodb-bench -d -t mohdahmad/mongodb-test:0.4
+#loads a ~20GB dataset
+
+cores=$2
+
+docker run --cpuset-cpus=$2 --name mongodb-client -d -t mohdahmad/mongodb-test:0.2
 echo "launched container..."
 
-docker exec -t -d mongodb-bench bash -c "cd /home/mongodb-linux-x86_64-3.2.6 ; ./bin/mongod --dbpath /tmp/mongodb"
-echo "launched mongoDb..."
-sleep 30
+#docker exec -t mongodb-client bash -c "cd /usr/local/ycsb-0.5.0 ; ./bin/ycsb load mongodb-async -s -P workloads/workloadb > outputLoad1.txt -p mongodb.url=mongodb://mongodb-server:27017/ycsb?w=1 -p recordcount=200000 -p mongodb.upsert=true" 
+#echo "loaded data..."
 
 if [ $1 == "background" ]; then
-        docker exec -d mongodb-bench bash -c "cd /usr/local/ycsb-0.5.0 ; ./bin/ycsb run mongodb-async -s -P workloads/workloada > outputRun.txt -p operationcount=10000000000; cat outputRun.txt" &
+        docker exec -d mongodb-client bash -c "cd /usr/local/ycsb-0.5.0 ; ./bin/ycsb run mongodb-async -s -P workloads/workloada > outputRun.txt -p operationcount=100000000 -p mongodb.url=mongodb://mongodb-server:27017/ycsb?w=1; cat outputRun.txt" & 
 else #1 million operations, 50% read, 50% write  
-        docker exec mongodb-bench bash -c "cd /usr/local/ycsb-0.5.0 ; ./bin/ycsb run mongodb-async -s -P workloads/workloada > outputRun.txt -p operationcount=1000000; cat outputRun.txt" > $1
+        docker exec mongodb-client bash -c "cd /usr/local/ycsb-0.5.0 ; ./bin/ycsb run mongodb-async -s -P workloads/workloada > outputRun.txt -p operationcount=1000000 -p mongodb.url=mongodb://mongodb-server:27017/ycsb?w=1; cat outputRun.txt" > $1
 fi
 
-sleep 15
