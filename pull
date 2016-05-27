@@ -14,7 +14,7 @@ docker pull mohdahmad/data-caching:client
 docker pull cloudsuite/web-serving:web_server
 docker pull cloudsuite/web-serving:db_server
 docker pull cloudsuite/web-serving:memcached_server
-docker pull cloudsuite/web-serving:faban_client
+docker pull mohdahmad/web-serving:faban_client
 
 ##data-serving
 docker pull mohdahmad/data-serving:client

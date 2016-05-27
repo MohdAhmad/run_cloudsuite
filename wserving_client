@@ -1,18 +1,25 @@
 #!/bin/bash
 
-docker network create my_net
+run_file_path=$1
+output_file=$2
+cores=$3
 
-docker run -d -t --cpuset-cpus="8" --net=my_net --privileged=true --name=web_server cloudsuite/web-serving:web_server /etc/bootstrap.sh
+
+docker run -d -t --cpuset-cpus="14-15"  --privileged=true --name=mysql_server cloudsuite/web-serving:db_server
 sleep 2
-docker run -d -t --cpuset-cpus="4-7" --net=my_net --privileged=true --name=mysql_server cloudsuite/web-serving:db_server
+
+docker run -d -t  --cpuset-cpus="12-13" --privileged=true --name=memcache_server cloudsuite/web-serving:memcached_server
 sleep 2
-docker run -d -t  --cpuset-cpus="4-7" --net=my_net --privileged=true --name=memcache_server cloudsuite/web-serving:memcached_server
-sleep 2
-docker run -d -t --cpuset-cpus="4-7" --net=my_net --privileged=true --name=faban_client cloudsuite/web-serving:faban_client /etc/bootstrap.sh -bash
+
+docker run -d -t --cpuset-cpus=$cores --privileged=true --name=faban_client mohdahmad/web-serving:faban_client /etc/bootstrap.sh -bash
 sleep 10 
 
-if [ $1 == "background" ]; then #run_background which has longer steady state time
-        exec $(pwd)/run_background.sh &
+
+web_server_ip=$(weave status dns | awk '$1=="web_server" {print $2}')
+
+if [ $2 == "background" ]; then #run_background which has longer steady state time
+	echo running in background
+        $run_file_path/run_background.sh $web_server_ip
 else 
-        exec $(pwd)/run.sh $1
+        $run_file_path/run.sh $web_server_ip $output_file
 fi
