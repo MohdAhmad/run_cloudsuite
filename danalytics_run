@@ -1,0 +1,176 @@
+#!/bin/bash
+
+if [ $1 == "2mb" ]; then
+        csize="2mb"
+        p1=0x3 
+        p2=0xffffc
+        module=/home/ahmad/scheduler_partitioned
+elif [ $1 == "3mb" ]; then
+        csize="3mb"
+        p1=0x7 
+        p2=0xffff8
+        module=/home/ahmad/scheduler_3mb
+elif [ $1 == "4mb" ]; then 
+        csize="4mb"
+        p1=0xf 
+        p2=0xffff0
+        module=/home/ahmad/scheduler_4mb
+fi
+
+echo Setting cache size to: $csize
+
+cat=/home/ahmad/catConfig
+bmk=$(pwd)/run_cloudsuite
+results=$(pwd)/run_cloudsuite/results/$csize
+
+###dataanalytics with other bmks
+$bmk/docker_cleanup
+rmmod scheduler_km
+$cat/reset_cat.sh
+
+##run data_caching bmk
+$bmk/run_datacaching 'background'
+sleep 20
+
+##run dataanlytics bmk
+$bmk/run_dataanalytics $results/dataanlytics/with_datacaching_base.xml
+
+##config 
+$bmk/docker_cleanup
+$cat/single_cat.sh 0x3 0xffffc
+
+##run data_caching bmk
+$bmk/run_datacaching 'background'
+sleep 20
+
+##run dataanlytics bmk
+$bmk/run_dataanalytics $results/dataanlytics/with_datacaching_partitioned.xml
+
+##config 
+$bmk/docker_cleanup
+insmod $module/scheduler_km.ko
+
+##run data_caching bmk
+$bmk/run_datacaching 'background'
+sleep 20
+
+##run dataanlytics bmk
+$bmk/run_dataanalytics $results/dataanlytics/with_datacaching_flush.xml
+
+echo ---------------TESTS WITH DATACACHING COMPLETE---------------------------------
+
+echo ------------------------TESTS WITH DATASERVING STARTING------------------------------
+
+$bmk/docker_cleanup 
+rmmod scheduler_km
+$cat/reset_cat.sh
+
+##run data_serving bmk
+$bmk/run_dataserving 'background' &
+sleep 15
+
+##run dataanlytics bmk
+$bmk/run_dataanalytics $results/dataanlytics/with_dataserving_base.xml
+
+##config 
+kill -TERM $(ps axj | grep run_data | awk '$11=="/home/ahmad/benchmarks/run_cloudsuite/run_dataanalytics" {print $2}')
+$bmk/docker_cleanup
+$cat/single_cat.sh 0x3 0xffffc
+
+##run data_analytics bmk
+$bmk/run_dataserving 'background' &
+sleep 15
+
+##run dataanlytics bmk
+$bmk/run_dataanalytics $results/dataanlytics/with_dataanalytics_partitioned.xml
+
+##config 
+$bmk/docker_cleanup
+insmod $module/scheduler_km.ko
+
+##run data_analytics bmk
+$bmk/run_dataserving 'background' &
+sleep 15
+
+##run dataanlytics bmk
+$bmk/run_dataanalytics $results/dataanlytics/with_dataanalytics_flush.xml
+
+echo ----------------------TESTS WITH DATAANALYTICS COMPLETE-------------------------
+
+echo -----------------------TEST WITH GOBMK STARTING---------------------------------
+
+$bmk/docker_cleanup 
+rmmod scheduler_km
+$cat/reset_cat.sh
+
+#run go bmk
+$bmk/run_gobmk 'background' &
+sleep 15
+
+##run dataanlytics bmk
+$bmk/run_dataanalytics $results/dataanlytics/with_go_base.xml
+
+##config 
+$bmk/docker_cleanup
+$cat/single_cat.sh 0x3 0xffffc
+
+#run go bmk
+$bmk/run_gobmk 'background' &
+sleep 15
+
+##run dataanlytics bmk
+$bmk/run_dataanalytics $results/dataanlytics/with_go_partitioned.xml
+
+##config 
+$bmk/docker_cleanup
+insmod $module/scheduler_km.ko
+
+##run data_analytics bmk
+$bmk/run_gobmk 'background' &
+sleep 15
+
+##run dataanlytics bmk
+$bmk/run_dataanalytics $results/dataanlytics/with_go_flush.xml
+
+echo -----------------------TEST WITH GOBMK COMPLETE---------------------------------
+
+echo -----------------------TEST WITH WEBSERVING STARTING---------------------------------
+
+$bmk/docker_cleanup 
+rmmod scheduler_km
+$cat/reset_cat.sh
+
+#run webserving bmk
+$bmk/run_webserving 'background' &
+sleep 240 
+
+##run dataanlytics bmk
+$bmk/run_dataanalytics $results/dataanlytics/with_webserving_base.xml
+
+##config 
+$bmk/docker_cleanup
+$cat/single_cat.sh 0x3 0xffffc
+
+#run webserving bmk
+$bmk/run_webserving 'background' &
+sleep 240
+
+##run dataanlytics bmk
+$bmk/run_dataanalytics $results/dataanlytics/with_webserving_partitioned.xml
+
+##config 
+$bmk/docker_cleanup
+insmod $module/scheduler_km.ko
+
+#run webserving bmk
+$bmk/run_webserving 'background' &
+sleep 240
+
+##run dataanlytics bmk
+$bmk/run_dataanalytics $results/dataanlytics/with_webserving_flush.xml
+
+echo -----------------------TEST WITH WEBSERVING COMPLETE---------------------------------
+
+$bmk/docker_cleanup 
+rmmod scheduler_km
+$cat/reset_cat.sh
