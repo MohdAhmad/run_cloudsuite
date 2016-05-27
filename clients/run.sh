@@ -2,7 +2,7 @@ web_server_ip=$1
 
 docker exec faban_client sh -c "cd /web20_benchmark/build && java -jar Usergen.jar http://$web_server_ip:8080"
 
-docker exec faban_client sh -c "sed -i 's/<fa:scale.*/<fa:scale>150<\\/fa:scale>/' /web20_benchmark/deploy/run.xml"
+docker exec faban_client sh -c "sed -i 's/<fa:scale.*/<fa:scale>200<\\/fa:scale>/' /web20_benchmark/deploy/run.xml"
 docker exec faban_client sh -c "sed -i 's/<fa:rampUp.*/<fa:rampUp>30<\\/fa:rampUp>/' /web20_benchmark/deploy/run.xml"
 docker exec faban_client sh -c "sed -i 's/<fa:rampDown.*/<fa:rampDown>30<\\/fa:rampDown>/' /web20_benchmark/deploy/run.xml"
 docker exec faban_client sh -c "sed -i 's/<fa:steadyState.*/<fa:steadyState>180<\\/fa:steadyState>/' /web20_benchmark/deploy/run.xml"
