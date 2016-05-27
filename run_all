@@ -1,0 +1,15 @@
+#!/bin/bash
+
+./dcaching_run "2mb" 
+#./dserving_run "3mb" 
+#./wserving_run "3mb" 
+#./danalytics_run "3mb" 
+
+./dcaching_run "4mb" 
+#./dserving_run "4mb" 
+#./wserving_run "4mb" 
+#./danalytics_run "4mb" 
+
+echo "Datacaching Tests complete" | mail -s "Dcaching complete" mohd.ahmad17@gmail.com
+
+echo TESTS COMPLETE!

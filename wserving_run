@@ -1,0 +1,235 @@
+#!/bin/bash
+
+if [ $1 == "2mb" ]; then
+        csize="2mb"
+        p1=0x3 
+        p2=0xffffc
+        module=/home/ahmad/scheduler_2mb
+elif [ $1 == "3mb" ]; then
+        csize="3mb"
+        p1=0x7 
+        p2=0xffff8
+        module=/home/ahmad/scheduler_3mb
+elif [ $1 == "4mb" ]; then 
+        csize="4mb"
+        p1=0xf 
+        p2=0xffff0
+        module=/home/ahmad/scheduler_4mb
+fi
+
+echo setting cache size to: $csize
+
+cat=/home/ahmad/catConfig
+srun_cs_path=/home/ahmad/benchmarks/run_cloudsuite
+hserver_bmk=$srun_cs_path/servers
+hclient_bmk=$srun_cs_path/clients
+hresults=$srun_cs_path/results/$csize
+crun_cs_path=/home/ubuntu/run_cloudsuite
+cserver_bmk=$crun_cs_path/servers
+cclient_bmk=$crun_cs_path/clients
+cresults=$crun_cs_path/results/$csize
+
+ssh_command="ssh root@525-1.behrat.net"
+weave_eval="eval $(weave env)"
+
+eval $(weave env)
+
+#wserving with other bmks
+$srun_cs_path/docker_cleanup
+$ssh_command "$crun_cs_path/docker_cleanup"
+rmmod scheduler_km
+$cat/reset_cat.sh
+
+##run dcaching bmk
+$hserver_bmk/dcaching_server
+$ssh_command "$weave_eval && $cclient_bmk/dcaching_client background 4-7"
+echo dcaching bmk launched....
+
+##run wserving bmk
+$hserver_bmk/wserving_server
+$ssh_command "$weave_eval && $cclient_bmk/wserving_client $cclient_bmk $cresults/wserving/with_dcaching_base 0-3"
+echo wserving bmk launched....
+
+##config 
+$srun_cs_path/docker_cleanup
+$ssh_command "$crun_cs_path/docker_cleanup"
+$cat/single_cat.sh $p1 $p2
+
+##run dcaching bmk
+$hserver_bmk/dcaching_server
+$ssh_command "$weave_eval && $cclient_bmk/dcaching_client background 4-7"
+echo dcaching bmk launched....
+
+##run wserving bmk
+$hserver_bmk/wserving_server
+$ssh_command "$weave_eval && $cclient_bmk/wserving_client $cclient_bmk $cresults/wserving/with_dcaching_partitioned 0-3"
+echo wserving bmk launched....
+
+##config 
+$srun_cs_path/docker_cleanup
+$ssh_command "$crun_cs_path/docker_cleanup"
+insmod $module/scheduler_km.ko
+
+##run dcaching bmk
+$hserver_bmk/dcaching_server
+$ssh_command "$weave_eval && $cclient_bmk/dcaching_client background 4-7"
+echo dcaching bmk launched....
+
+##run wserving bmk
+$hserver_bmk/wserving_server
+$ssh_command "$weave_eval && $cclient_bmk/wserving_client $cclient_bmk $cresults/wserving/with_dcaching_flush 0-3"
+echo wserving bmk launched....
+
+echo ---------------TESTS WITH DCACHING COMPLETE---------------------------------
+
+echo ------------------------TESTS WITH DATAANALYTICS STARTING------------------------------
+$srun_cs_path/docker_cleanup
+$ssh_command "$crun_cs_path/docker_cleanup"
+rmmod scheduler_km
+$cat/reset_cat.sh
+
+#run danalytics bmk
+$hserver_bmk/danalytics 'background' &
+sleep 15
+
+##run wserving bmk
+$hserver_bmk/wserving_server
+$ssh_command "$weave_eval && $cclient_bmk/wserving_client $cclient_bmk $cresults/wserving/with_danalytics_base  0-3"
+echo wserving bmk launched....
+
+#config 
+kill -TERM $(ps axj | grep danalytics | awk '$11=="/home/ahmad/benchmarks/run_cloudsuite/servers/danalytics" {print $2}')
+kill -TERM $(ps axj | grep spark | awk '$10=="/usr/lib/jvm/java-7-openjdk-amd64/jre/bin/java" {print $2}')
+$srun_cs_path/docker_cleanup
+$ssh_command "$crun_cs_path/docker_cleanup"
+$cat/single_cat.sh $p1 $p2
+
+#run danalytics bmk
+$hserver_bmk/danalytics 'background' &
+sleep 15
+
+##run wserving bmk
+$hserver_bmk/wserving_server
+$ssh_command "$weave_eval && $cclient_bmk/wserving_client $cclient_bmk $cresults/wserving/with_danalytics_partitioned 0-3"
+echo wserving bmk launched....
+
+##config 
+kill -TERM $(ps axj | grep danalytics | awk '$11=="/home/ahmad/benchmarks/run_cloudsuite/servers/danalytics" {print $2}')
+kill -TERM $(ps axj | grep spark | awk '$10=="/usr/lib/jvm/java-7-openjdk-amd64/jre/bin/java" {print $2}')
+$srun_cs_path/docker_cleanup
+$ssh_command "$crun_cs_path/docker_cleanup"
+insmod $module/scheduler_km.ko
+
+#run danalytics bmk
+$hserver_bmk/danalytics 'background' &
+sleep 15
+
+##run wserving bmk
+$hserver_bmk/wserving_server
+$ssh_command "$weave_eval && $cclient_bmk/wserving_client $cclient_bmk $cresults/wserving/with_danalytics_flush 0-3"
+echo wserving bmk launched....
+
+kill -TERM $(ps axj | grep danalytics | awk '$11=="/home/ahmad/benchmarks/run_cloudsuite/servers/danalytics" {print $2}')
+kill -TERM $(ps axj | grep spark | awk '$10=="/usr/lib/jvm/java-7-openjdk-amd64/jre/bin/java" {print $2}')
+
+echo ----------------------TESTS WITH DATAANALYTICS COMPLETE-------------------------
+
+echo -----------------------TEST WITH GOBMK STARTING---------------------------------
+
+$srun_cs_path/docker_cleanup
+$ssh_command "$crun_cs_path/docker_cleanup"
+rmmod scheduler_km
+$cat/reset_cat.sh
+
+#run go bmk
+$hserver_bmk/gobmk 'background' &
+sleep 15
+
+##run wserving bmk
+$hserver_bmk/wserving_server
+$ssh_command "$weave_eval && $cclient_bmk/wserving_client $cclient_bmk $cresults/wserving/with_go_base 0-3"
+echo wserving bmk launched....
+
+##config 
+$srun_cs_path/docker_cleanup
+$ssh_command "$crun_cs_path/docker_cleanup"
+$cat/single_cat.sh $p1 $p2
+
+#run go bmk
+$hserver_bmk/gobmk 'background' &
+sleep 15
+
+##run wserving bmk
+$hserver_bmk/wserving_server
+$ssh_command "$weave_eval && $cclient_bmk/wserving_client $cclient_bmk $cresults/wserving/with_go_partitioned 0-3"
+echo wserving bmk launched....
+
+##config 
+$srun_cs_path/docker_cleanup
+$ssh_command "$crun_cs_path/docker_cleanup"
+insmod $module/scheduler_km.ko
+
+#run go bmk
+$hserver_bmk/gobmk 'background' &
+sleep 15
+
+##run wserving bmk
+$hserver_bmk/wserving_server
+$ssh_command "$weave_eval && $cclient_bmk/wserving_client $cclient_bmk $cresults/wserving/with_go_flush 0-3"
+echo wserving bmk launched....
+
+echo -----------------------TEST WITH GOBMK COMPLETE---------------------------------
+
+echo -----------------------TEST WITH DATASERVING STARTING---------------------------------
+
+$srun_cs_path/docker_cleanup
+$ssh_command "$crun_cs_path/docker_cleanup"
+rmmod scheduler_km
+$cat/reset_cat.sh
+
+#run dataserving bmk
+$hserver_bmk/dserving_server
+$ssh_command "$weave_eval && $cclient_bmk/dserving_client background 4-7"
+sleep 15
+
+##run wserving bmk
+$hserver_bmk/wserving_server
+$ssh_command "$weave_eval && $cclient_bmk/wserving_client $cclient_bmk $cresults/wserving/with_dserving_base 0-3"
+echo wserving bmk launched....
+
+##config 
+$srun_cs_path/docker_cleanup
+$ssh_command "$crun_cs_path/docker_cleanup"
+$cat/single_cat.sh $p1 $p2
+
+#run dataserving bmk
+$hserver_bmk/dserving_server
+$ssh_command "$weave_eval && $cclient_bmk/dserving_client background 4-7"
+sleep 15
+
+##run wserving bmk
+$hserver_bmk/wserving_server
+$ssh_command "$weave_eval && $cclient_bmk/wserving_client $cclient_bmk $cresults/wserving/with_dserving_partitioned 0-3"
+echo wserving bmk launched....
+
+##config 
+$srun_cs_path/docker_cleanup
+$ssh_command "$crun_cs_path/docker_cleanup"
+insmod $module/scheduler_km.ko
+
+#run dataserving bmk
+$hserver_bmk/dserving_server
+$ssh_command "$weave_eval && $cclient_bmk/dserving_client background 4-7"
+sleep 15
+
+##run wserving bmk
+$hserver_bmk/wserving_server
+$ssh_command "$weave_eval && $cclient_bmk/wserving_client $cclient_bmk $cresults/wserving/with_dserving_flush 0-3"
+echo wserving bmk launched....
+
+echo -----------------------TEST WITH DATASERVING COMPLETE---------------------------------
+
+$srun_cs_path/docker_cleanup
+$ssh_command "$crun_cs_path/docker_cleanup"
+rmmod scheduler_km
+$cat/reset_cat.sh
