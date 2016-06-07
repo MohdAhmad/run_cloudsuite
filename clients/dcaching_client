@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#Scales twitter dataset to 10x=3GB and send 40k requests/second.
+#Scales twitter dataset to 10x=3GB and send 30k requests/second.
 #Reduce the number of server threads to 1 and client threads to 4
 #Reduced client connections to 100
 
@@ -12,8 +12,9 @@ sleep 3
 
 if [ $1 == 'background' ]; then #run without a timeout
         echo Running data caching bmk without a timeout
-        docker exec -d -t dc-client bash -c "cd /usr/src/memcached/memcached_client/; ./loader -a ../twitter_dataset/twitter_dataset_10x -s docker_servers.txt -g 0.8 -T 240 -c 100 -w 4 -e -r 40000"
+        docker exec -d -t dc-client bash -c "cd /usr/src/memcached/memcached_client/; ./loader -a ../twitter_dataset/twitter_dataset_5x -s docker_servers.txt -g 0.8 -T 300 -c 80 -w 4 -e -r 30000"
 else #run with a timeout
         echo Running data caching bmk with a timeout
-        docker exec -t dc-client bash -c "cd /usr/src/memcached/memcached_client/; ./loader -a ../twitter_dataset/twitter_dataset_10x -s docker_servers.txt -g 0.8 -T 240 -t 720 -c 80 -w 4 -e -r 40000" > $1 
+        docker exec -t dc-client bash -c "cd /usr/src/memcached/memcached_client/; ./loader -a ../twitter_dataset/twitter_dataset_5x -s docker_servers.txt -g 0 -T 600 -t 1800 -c 40 -w 4 -e -r 30000" > $1 
+        docker exec -t dc-client bash -c "cd /usr/src/memcached/memcached_client/; ./loader -a ../twitter_dataset/twitter_dataset_5x -s docker_servers.txt -g 1.0 -T 600 -t 1800 -c 40 -w 4 -e -r 30000" >> $1 
 fi

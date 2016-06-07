@@ -17,8 +17,6 @@ elif [ $1 == "4mb" ]; then
         module=/home/ahmad/scheduler_4mb
 fi
 
-echo setting cache size to: $csize
-
 cat=/home/ahmad/catConfig
 srun_cs_path=/home/ahmad/benchmarks/run_cloudsuite
 hserver_bmk=$srun_cs_path/servers
@@ -128,8 +126,6 @@ $ssh_command "$weave_eval && $cclient_bmk/dserving_client $cresults/dserving/wit
 kill -TERM $(ps axj | grep danalytics | awk '$11=="/home/ahmad/benchmarks/run_cloudsuite/servers/danalytics" {print $2}')
 kill -TERM $(ps axj | grep spark | awk '$10=="/usr/lib/jvm/java-7-openjdk-amd64/jre/bin/java" {print $2}')
 
-echo ----------------------TESTS WITH DATAANALYTICS COMPLETE-------------------------
-
 echo -----------------------TEST WITH GOBMK STARTING---------------------------------
 
 $srun_cs_path/docker_cleanup
@@ -216,10 +212,3 @@ sleep 15
 #run dserving bmk
 $hserver_bmk/dserving_server
 $ssh_command "$weave_eval && $cclient_bmk/dserving_client $cresults/dserving/with_dcaching_flush 0-3"
-
-echo -----------------------TEST WITH DCACHING COMPLETE---------------------------------
-
-$srun_cs_path/docker_cleanup
-$ssh_command "$crun_cs_path/docker_cleanup"
-rmmod scheduler_km
-$cat/reset_cat.sh

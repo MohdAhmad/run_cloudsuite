@@ -61,7 +61,7 @@ echo wserving bmk launched....
 
 ##run danalytics bmk
 $hserver_bmk/danalytics_server $hresults/danalytics/with_wserving_partitioned 
-#
+
 ##config 
 $srun_cs_path/docker_cleanup
 $ssh_command "$crun_cs_path/docker_cleanup"
@@ -124,41 +124,46 @@ echo -----------------------TEST WITH GOBMK STARTING----------------------------
 
 $srun_cs_path/docker_cleanup
 $ssh_command "$crun_cs_path/docker_cleanup"
+
+cat=/home/ahmad/catConfig
+bmk=$(pwd)/run_cloudsuite
+results=$(pwd)/run_cloudsuite/results/$csize
+
+###dataanalytics with other bmks
+$bmk/docker_cleanup
 rmmod scheduler_km
 $cat/reset_cat.sh
 
-#run go bmk
-$hserver_bmk/gobmk 'background' &
-sleep 15
+##run data_caching bmk
+$bmk/run_datacaching 'background'
+sleep 20
 
-##run danalytics bmk
-$hserver_bmk/danalytics_server $hresults/danalytics/with_go_base 
-
-##config 
-$srun_cs_path/docker_cleanup
-$ssh_command "$crun_cs_path/docker_cleanup"
-$cat/single_cat.sh $p1 $p2
-
-#run go bmk
-$hserver_bmk/gobmk 'background' &
-sleep 15
-
-##run danalytics bmk
-$hserver_bmk/danalytics_server $hresults/danalytics/with_go_partitioned 
+##run dataanlytics bmk
+$bmk/run_dataanalytics $results/dataanlytics/with_datacaching_base.xml
 
 ##config 
-$srun_cs_path/docker_cleanup
-$ssh_command "$crun_cs_path/docker_cleanup"
+$bmk/docker_cleanup
+$cat/single_cat.sh 0x3 0xffffc
+
+##run data_caching bmk
+$bmk/run_datacaching 'background'
+sleep 20
+
+##run dataanlytics bmk
+$bmk/run_dataanalytics $results/dataanlytics/with_datacaching_partitioned.xml
+
+##config 
+$bmk/docker_cleanup
 insmod $module/scheduler_km.ko
 
-#run go bmk
-$hserver_bmk/gobmk 'background' &
-sleep 15
+##run data_caching bmk
+$bmk/run_datacaching 'background'
+sleep 20
 
-##run danalytics bmk
-$hserver_bmk/danalytics_server $hresults/danalytics/with_go_flush 
+##run dataanlytics bmk
+$bmk/run_dataanalytics $results/dataanlytics/with_datacaching_flush.xml
 
-echo -----------------------TEST WITH GOBMK COMPLETE---------------------------------
+echo ---------------TESTS WITH GOBMK COMPLETE---------------------------------
 
 echo -----------------------TEST WITH DSERVING STARTING---------------------------------
 
@@ -202,8 +207,3 @@ sleep 15
 $hserver_bmk/danalytics_server $hresults/danalytics/with_dserving_flush 
 
 echo -----------------------TEST WITH DATASERVING COMPLETE---------------------------------
-
-$srun_cs_path/docker_cleanup
-$ssh_command "$crun_cs_path/docker_cleanup"
-rmmod scheduler_km
-$cat/reset_cat.sh
